@@ -145,7 +145,8 @@ namespace SpyCup
 				{
 					if (sc.RoleDict.ContainsKey(ev.Player.SteamId))
 					{
-						ev.Damage = 0.0f;
+						if (!ev.DamageType.Equals(DamageType.POCKET))
+							ev.Damage = 0.0f;
 					}
 				}
 
@@ -153,7 +154,8 @@ namespace SpyCup
 				{
 					if (ev.Player.TeamRole.Team.Equals(Team.CLASSD) || ev.Player.TeamRole.Team.Equals(Team.CHAOS_INSURGENCY))
 					{
-						ev.Damage = 0.0f;
+						if (!ev.DamageType.Equals(DamageType.POCKET))
+							ev.Damage = 0.0f;
 					}
 				}
 			}
