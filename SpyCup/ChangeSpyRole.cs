@@ -19,7 +19,25 @@ namespace SpyCup
 				//plugin.Info("Changed player " + player.Name + "'s role to " + sc.RoleDict[player.SteamId]);
             }
             System.Threading.Thread.Sleep((int)time);
-            player.GiveItem(ItemType.CUP);
+
+			List<Item> inv = player.GetInventory();
+			sc.Info(inv.Count.ToString());
+			if (inv.Count > 7 && !player.HasItem(ItemType.CUP))
+			{
+				Item lastItem = inv[7];
+				sc.Info(inv[7].ToString());
+				foreach (Item item in player.GetInventory())
+				{
+					if (item.ItemType == lastItem.ItemType)
+					{
+						item.Remove();
+						break;
+					}
+				}
+				sc.pluginManager.Server.Map.SpawnItem(lastItem.ItemType, player.GetPosition(), Vector.Zero);
+			}
+
+			player.GiveItem(ItemType.CUP);
             Thread.CurrentThread.Abort();
         }
     }

@@ -49,6 +49,7 @@
     <Compile Include="ChangeSpyRole.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="EventHandler.cs" />
+    <Compile Include="HandcuffHandler.cs" />
     <Compile Include="SpyCup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpyHandler.cs" />

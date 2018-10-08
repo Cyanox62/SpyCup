@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace SpyCup
 {
-	class EventHandler : IEventHandlerRoundStart, IEventHandlerHandcuffed, IEventHandlerPlayerDropItem, IEventHandlerPlayerDie, IEventHandlerPlayerHurt, IEventHandlerTeamRespawn, IEventHandlerSetRole
+	class EventHandler : IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerHandcuffed, IEventHandlerPlayerDropItem, IEventHandlerPlayerDie, IEventHandlerPlayerHurt, IEventHandlerTeamRespawn, IEventHandlerSetRole
 	{
 		private Plugin plugin;
 		SpyCup sc;
@@ -24,33 +24,45 @@ namespace SpyCup
 		public void OnRoundStart(RoundStartEvent ev)
 		{
 			if (plugin.GetConfigBool("spycup_enabled"))
+			{
 				sc.RoleDict.Clear();
 
-			int guardChance = rand.Next(1, 101);
-			plugin.Info("Chance of guard spawn: " + guardChance.ToString());
-			if (guardChance <= plugin.GetConfigInt("spycup_guard_chance"))
-			{
-				//plugin.Info("Spawning guard spy...");
-				List<Player> Guards = new List<Player>();
-				List<Player> Players = new List<Player>(plugin.pluginManager.Server.GetPlayers());
-				List<Role> Roles = new List<Role>();
-
-				foreach(Player player in Players){ Roles.Add(player.TeamRole.Role); }
-
-				if (Roles.Contains(Role.FACILITY_GUARD))
+				int guardChance = rand.Next(1, 101);
+				plugin.Info("Chance of guard spawn: " + guardChance.ToString());
+				if (guardChance <= plugin.GetConfigInt("spycup_guard_chance"))
 				{
-					foreach (Player player in Players)
+					plugin.Info("Spawning guard spy...");
+					List<Player> Guards = new List<Player>();
+					List<Player> Players = new List<Player>(plugin.pluginManager.Server.GetPlayers());
+					List<Role> Roles = new List<Role>();
+
+					foreach (Player player in Players) { Roles.Add(player.TeamRole.Role); }
+
+					if (Roles.Contains(Role.FACILITY_GUARD))
 					{
-						if (player.TeamRole.Role.Equals(Role.FACILITY_GUARD))
-							Guards.Add(player);
+						foreach (Player player in Players)
+						{
+							if (player.TeamRole.Role.Equals(Role.FACILITY_GUARD))
+								Guards.Add(player);
+						}
+
+						Player guardSpy = Guards[rand.Next(Guards.Count)];
+
+						sc.RoleDict.Add(guardSpy.SteamId, Role.FACILITY_GUARD);
+						guardSpy.GiveItem(ItemType.CUP);
 					}
-
-					Player guardSpy = Guards[rand.Next(Guards.Count)];
-
-					sc.RoleDict.Add(guardSpy.SteamId, Role.FACILITY_GUARD);
-					guardSpy.GiveItem(ItemType.CUP);
 				}
+				sc.roundStarted = true;
+
+				Thread HandcuffHandler = new Thread(new ThreadStart(() => new HandcuffHandler(sc, this)));
+				HandcuffHandler.Start();
 			}
+		}
+
+		public void OnRoundEnd(RoundEndEvent ev)
+		{
+			if (plugin.GetConfigBool("spycup_enabled"))
+				sc.roundStarted = false;
 		}
 
 		public void ChangeSpyRole(Team team, Player player)
@@ -72,7 +84,6 @@ namespace SpyCup
 			//{
 			//    plugin.Info(entry.Key.ToString() + " " + entry.Value);
 			//}
-
 			foreach (Item item in player.GetInventory()) { item.Remove(); }
 			foreach (Item item in Inventory) { player.GiveItem(item.ItemType); }
 
