@@ -25,7 +25,6 @@ namespace SpyCup
 			if (inv.Count > 7 && !player.HasItem(ItemType.CUP))
 			{
 				Item lastItem = inv[7];
-				sc.Info(inv[7].ToString());
 				foreach (Item item in player.GetInventory())
 				{
 					if (item.ItemType == lastItem.ItemType)
@@ -36,8 +35,8 @@ namespace SpyCup
 				}
 				sc.pluginManager.Server.Map.SpawnItem(lastItem.ItemType, player.GetPosition(), Vector.Zero);
 			}
-
-			player.GiveItem(ItemType.CUP);
+			if (!player.IsHandcuffed())
+				player.GiveItem(ItemType.CUP);
             Thread.CurrentThread.Abort();
         }
     }

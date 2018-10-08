@@ -6,11 +6,14 @@ using System.Threading;
 
 namespace SpyCup
 {
+
+	// IGNORE ALL THIS CODE, THIS DOESN'T HAVE ANY APPLICATION TO THE PLUGIN ANYMORE
+
 	class HandcuffHandler
 	{
 		public HandcuffHandler(SpyCup sc, EventHandler ev)
 		{
-			while (sc.roundStarted)
+			if (1==1)//while (sc.roundStarted)
 			{
 				System.Threading.Thread.Sleep(1000);
 

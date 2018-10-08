@@ -23,7 +23,7 @@ namespace SpyCup
 
         public Dictionary<string, Role> RoleDict = new Dictionary<string, Role>();
 
-		public bool roundStarted = false;
+		//public bool roundStarted = false;
 
         public override void OnDisable() { }
 

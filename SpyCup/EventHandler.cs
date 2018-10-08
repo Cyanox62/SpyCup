@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace SpyCup
 {
-	class EventHandler : IEventHandlerRoundStart, IEventHandlerRoundEnd, IEventHandlerHandcuffed, IEventHandlerPlayerDropItem, IEventHandlerPlayerDie, IEventHandlerPlayerHurt, IEventHandlerTeamRespawn, IEventHandlerSetRole
+	class EventHandler : IEventHandlerRoundStart, IEventHandlerPlayerDropItem, IEventHandlerPlayerDie, IEventHandlerPlayerHurt, IEventHandlerTeamRespawn, IEventHandlerSetRole
 	{
 		private Plugin plugin;
 		SpyCup sc;
@@ -52,18 +52,18 @@ namespace SpyCup
 						guardSpy.GiveItem(ItemType.CUP);
 					}
 				}
-				sc.roundStarted = true;
+				//sc.roundStarted = true;
 
-				Thread HandcuffHandler = new Thread(new ThreadStart(() => new HandcuffHandler(sc, this)));
-				HandcuffHandler.Start();
+				//Thread HandcuffHandler = new Thread(new ThreadStart(() => new HandcuffHandler(sc, this)));
+				//HandcuffHandler.Start();
 			}
 		}
 
-		public void OnRoundEnd(RoundEndEvent ev)
+		/*public void OnRoundEnd(RoundEndEvent ev)
 		{
 			if (plugin.GetConfigBool("spycup_enabled"))
 				sc.roundStarted = false;
-		}
+		}*/
 
 		public void ChangeSpyRole(Team team, Player player)
 		{
@@ -169,10 +169,21 @@ namespace SpyCup
 							ev.Damage = 0.0f;
 					}
 				}
+
+				if (ev.Player.TeamRole.Team.Equals(Team.NINETAILFOX) && ev.Player.IsHandcuffed() && sc.RoleDict.ContainsKey(ev.Player.SteamId) && ev.Player.GetHealth() > 0)
+				{
+					Vector pos = ev.Player.GetPosition();
+					int health = ev.Player.GetHealth();
+					ev.Player.ChangeRole(Role.CHAOS_INSUGENCY);
+					foreach (Item item in ev.Player.GetInventory()) { item.Remove(); }
+					ev.Player.Teleport(pos);
+					ev.Player.SetHealth(health);
+					sc.RoleDict.Remove(ev.Player.SteamId);
+				}
 			}
 		}
 
-		public void OnHandcuffed(PlayerHandcuffedEvent ev)
+		/*public void OnHandcuffed(PlayerHandcuffedEvent ev) // THIS EVENT IS CURRENTLY BROKEN
 		{
 			//plugin.Info("onhandcuffed");
 			if (plugin.GetConfigBool("spycup_enabled"))
@@ -188,7 +199,7 @@ namespace SpyCup
 					ChangeSpyRole(Team.NINETAILFOX, ev.Player);
 				}
 			}
-		}
+		}*/
 
 		public void OnPlayerDropItem(PlayerDropItemEvent ev)
 		{
