@@ -21,6 +21,39 @@ namespace SpyCup
 			sc = scc;
 		}
 
+		public void ChangeSpyRole(Smod2.API.Team team, Player player)
+		{
+			List<Smod2.API.Item> Inventory = player.GetInventory();
+			Vector pos = player.GetPosition();
+			UnityEngine.GameObject pObj = (UnityEngine.GameObject)player.GetGameObject();
+			float rot = pObj.GetComponent<PlyMovementSync>().rotation;
+
+			int health = player.GetHealth();
+			int ammo5 = player.GetAmmo(AmmoType.DROPPED_5);
+			int ammo7 = player.GetAmmo(AmmoType.DROPPED_7);
+			int ammo9 = player.GetAmmo(AmmoType.DROPPED_9);
+
+			if (team.Equals(Smod2.API.Team.NINETAILFOX))
+				player.ChangeRole(Smod2.API.Role.CHAOS_INSUGENCY);
+			else if (team.Equals(Smod2.API.Team.CHAOS_INSURGENCY))
+				player.ChangeRole(sc.RoleDict[player.SteamId]);
+
+			foreach (Smod2.API.Item item in player.GetInventory()) { item.Remove(); }
+			foreach (Smod2.API.Item item in Inventory) { player.GiveItem(item.ItemType); }
+
+			player.SetAmmo(AmmoType.DROPPED_5, ammo5);
+			player.SetAmmo(AmmoType.DROPPED_7, ammo7);
+			player.SetAmmo(AmmoType.DROPPED_9, ammo9);
+
+			player.Teleport(pos, false);
+			player.SetHealth(health);
+
+			Thread ChangeSpyRole = new Thread(new ThreadStart(() => new ChangeSpyRole(sc, player, false)));
+			ChangeSpyRole.Start();
+			Thread SetRotation = new Thread(new ThreadStart(() => new SetRotation(sc, pObj, rot)));
+			SetRotation.Start();
+		}
+
 		public void OnRoundStart(RoundStartEvent ev)
 		{
 			if (plugin.GetConfigBool("spycup_enabled"))
@@ -65,39 +98,6 @@ namespace SpyCup
 				sc.roundStarted = false;
 		}*/
 
-		public void ChangeSpyRole(Team team, Player player)
-		{
-			List<Item> Inventory = player.GetInventory();
-			Vector pos = player.GetPosition();
-
-			int health = player.GetHealth();
-			int ammo5 = player.GetAmmo(AmmoType.DROPPED_5);
-			int ammo7 = player.GetAmmo(AmmoType.DROPPED_7);
-			int ammo9 = player.GetAmmo(AmmoType.DROPPED_9);
-
-			if (team.Equals(Team.NINETAILFOX))
-				player.ChangeRole(Role.CHAOS_INSUGENCY);
-			else if (team.Equals(Team.CHAOS_INSURGENCY))
-				player.ChangeRole(sc.RoleDict[player.SteamId]);
-
-			//foreach (KeyValuePair<string, Role> entry in sc.RoleDict)
-			//{
-			//    plugin.Info(entry.Key.ToString() + " " + entry.Value);
-			//}
-			foreach (Item item in player.GetInventory()) { item.Remove(); }
-			foreach (Item item in Inventory) { player.GiveItem(item.ItemType); }
-
-			player.SetAmmo(AmmoType.DROPPED_5, ammo5);
-			player.SetAmmo(AmmoType.DROPPED_7, ammo7);
-			player.SetAmmo(AmmoType.DROPPED_9, ammo9);
-
-			player.Teleport(pos, false);
-			player.SetHealth(health);
-
-			Thread ChangeSpyRole = new Thread(new ThreadStart(() => new ChangeSpyRole(sc, player, false)));
-			ChangeSpyRole.Start();
-		}
-
 		public void OnTeamRespawn(TeamRespawnEvent ev)
 		{
 			if (plugin.GetConfigBool("spycup_enabled"))
@@ -126,7 +126,7 @@ namespace SpyCup
 				if (ev.Player.TeamRole.Role.Equals(Role.UNASSIGNED)) return;
 				if (sc.RoleDict.ContainsKey(ev.Player.SteamId))
 				{
-					if (!ev.Player.TeamRole.Team.Equals(Team.NINETAILFOX) && !ev.Player.TeamRole.Team.Equals(Team.CHAOS_INSURGENCY))
+					if (!ev.Player.TeamRole.Team.Equals(Smod2.API.Team.NINETAILFOX) && !ev.Player.TeamRole.Team.Equals(Smod2.API.Team.CHAOS_INSURGENCY))
 					{
 						sc.RoleDict.Remove(ev.Player.SteamId);
 						//plugin.Info("Removed player " + ev.Player.Name + " from dict (ONSETROLE)");
@@ -152,7 +152,7 @@ namespace SpyCup
 		{
 			if (plugin.GetConfigBool("spycup_enabled"))
 			{
-				if (ev.Attacker.TeamRole.Team.Equals(Team.CHAOS_INSURGENCY) || ev.Attacker.TeamRole.Team.Equals(Team.CLASSD))
+				if (ev.Attacker.TeamRole.Team.Equals(Smod2.API.Team.CHAOS_INSURGENCY) || ev.Attacker.TeamRole.Team.Equals(Smod2.API.Team.CLASSD))
 				{
 					if (sc.RoleDict.ContainsKey(ev.Player.SteamId))
 					{
@@ -163,19 +163,19 @@ namespace SpyCup
 
 				if (sc.RoleDict.ContainsKey(ev.Attacker.SteamId))
 				{
-					if (ev.Player.TeamRole.Team.Equals(Team.CLASSD) || ev.Player.TeamRole.Team.Equals(Team.CHAOS_INSURGENCY))
+					if (ev.Player.TeamRole.Team.Equals(Smod2.API.Team.CLASSD) || ev.Player.TeamRole.Team.Equals(Smod2.API.Team.CHAOS_INSURGENCY))
 					{
 						if (!ev.DamageType.Equals(DamageType.POCKET))
 							ev.Damage = 0.0f;
 					}
 				}
 
-				if (ev.Player.TeamRole.Team.Equals(Team.NINETAILFOX) && ev.Player.IsHandcuffed() && sc.RoleDict.ContainsKey(ev.Player.SteamId) && ev.Player.GetHealth() > 0)
+				if (ev.Player.TeamRole.Team.Equals(Smod2.API.Team.NINETAILFOX) && ev.Player.IsHandcuffed() && sc.RoleDict.ContainsKey(ev.Player.SteamId) && ev.Player.GetHealth() > 0)
 				{
 					Vector pos = ev.Player.GetPosition();
 					int health = ev.Player.GetHealth();
 					ev.Player.ChangeRole(Role.CHAOS_INSUGENCY);
-					foreach (Item item in ev.Player.GetInventory()) { item.Remove(); }
+					foreach (Smod2.API.Item item in ev.Player.GetInventory()) { item.Remove(); }
 					ev.Player.Teleport(pos);
 					ev.Player.SetHealth(health);
 					sc.RoleDict.Remove(ev.Player.SteamId);
@@ -207,10 +207,10 @@ namespace SpyCup
 			{
 				if (ev.Item.ItemType.Equals(ItemType.CUP))
 				{
-					if (ev.Player.TeamRole.Team.Equals(Team.NINETAILFOX))
-						ChangeSpyRole(Team.NINETAILFOX, ev.Player);
-					else if (ev.Player.TeamRole.Team.Equals(Team.CHAOS_INSURGENCY))
-						ChangeSpyRole(Team.CHAOS_INSURGENCY, ev.Player);
+					if (ev.Player.TeamRole.Team.Equals(Smod2.API.Team.NINETAILFOX))
+						ChangeSpyRole(Smod2.API.Team.NINETAILFOX, ev.Player);
+					else if (ev.Player.TeamRole.Team.Equals(Smod2.API.Team.CHAOS_INSURGENCY))
+						ChangeSpyRole(Smod2.API.Team.CHAOS_INSURGENCY, ev.Player);
 				}
 			}
 		}

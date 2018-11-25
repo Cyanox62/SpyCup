@@ -1,6 +1,4 @@
-﻿using System;
-using Smod2;
-using Smod2.API;
+﻿using Smod2.API;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -10,7 +8,7 @@ namespace SpyCup
     {
         public ChangeSpyRole(SpyCup sc, Player player, bool delaySpawn)
         {
-            float time = sc.GetConfigFloat("spycup_cooldown") * 1000;
+			float time = sc.GetConfigFloat("spycup_cooldown") * 1000;
 
             if (delaySpawn)
             {
@@ -20,12 +18,11 @@ namespace SpyCup
             }
             System.Threading.Thread.Sleep((int)time);
 
-			List<Item> inv = player.GetInventory();
-			sc.Info(inv.Count.ToString());
+			List<Smod2.API.Item> inv = player.GetInventory();
 			if (inv.Count > 7 && !player.HasItem(ItemType.CUP))
 			{
-				Item lastItem = inv[7];
-				foreach (Item item in player.GetInventory())
+				Smod2.API.Item lastItem = inv[7];
+				foreach (Smod2.API.Item item in player.GetInventory())
 				{
 					if (item.ItemType == lastItem.ItemType)
 					{
@@ -37,7 +34,6 @@ namespace SpyCup
 			}
 			if (!player.IsHandcuffed())
 				player.GiveItem(ItemType.CUP);
-            Thread.CurrentThread.Abort();
-        }
+		}
     }
 }
