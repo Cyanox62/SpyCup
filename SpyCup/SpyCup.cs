@@ -31,8 +31,8 @@ namespace SpyCup
 
         public override void Register()
         {
-            this.AddEventHandlers(new EventHandler(this, this));
-            this.AddCommands(new string[] { "sc", "spycup" }, new Command(this, this));
+            this.AddEventHandlers(new EventHandler(this));
+            this.AddCommands(new string[] { "sc", "spycup" }, new Command(this));
             this.AddConfig(new Smod2.Config.ConfigSetting("spycup_enabled", true, Smod2.Config.SettingType.BOOL, true, "Enables SpyCup."));
 			this.AddConfig(new Smod2.Config.ConfigSetting("spycup_cooldown", 10f, Smod2.Config.SettingType.FLOAT, true, "Determines the cooldown from switching classes."));
 			this.AddConfig(new Smod2.Config.ConfigSetting("spycup_guard_chance", 50, Smod2.Config.SettingType.NUMERIC, true, "The chance for a facility guard to spawn as a spy"));

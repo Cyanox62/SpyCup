@@ -15,9 +15,9 @@ namespace SpyCup
 		SpyCup sc;
 		Random rand = new Random();
 
-		public EventHandler(Plugin plugin, SpyCup scc)
+		public EventHandler(SpyCup scc)
 		{
-			this.plugin = plugin;
+			plugin = scc;
 			sc = scc;
 		}
 

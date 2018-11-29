@@ -12,9 +12,9 @@ namespace SpyCup
 
         Random rand = new Random();
 
-        public Command(Plugin plugin, SpyCup scc)
+        public Command(SpyCup scc)
         {
-            this.plugin = plugin;
+            plugin = scc;
             sc = scc;
         }
 
