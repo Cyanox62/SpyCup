@@ -34,7 +34,7 @@ namespace SpyCup
 			int ammo9 = player.GetAmmo(AmmoType.DROPPED_9);
 
 			if (team.Equals(Smod2.API.Team.NINETAILFOX))
-				player.ChangeRole(Smod2.API.Role.CHAOS_INSUGENCY);
+				player.ChangeRole(Smod2.API.Role.CHAOS_INSURGENCY);
 			else if (team.Equals(Smod2.API.Team.CHAOS_INSURGENCY))
 				player.ChangeRole(sc.RoleDict[player.SteamId]);
 
@@ -174,7 +174,7 @@ namespace SpyCup
 				{
 					Vector pos = ev.Player.GetPosition();
 					int health = ev.Player.GetHealth();
-					ev.Player.ChangeRole(Role.CHAOS_INSUGENCY);
+					ev.Player.ChangeRole(Role.CHAOS_INSURGENCY);
 					foreach (Smod2.API.Item item in ev.Player.GetInventory()) { item.Remove(); }
 					ev.Player.Teleport(pos);
 					ev.Player.SetHealth(health);
